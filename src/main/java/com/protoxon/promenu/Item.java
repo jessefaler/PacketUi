@@ -6,12 +6,18 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemPro
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.github.retrooper.packetevents.protocol.nbt.NBTByte;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.Dummy;
 import com.protoxon.promenu.types.ClickData;
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.Tag;
 import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.Component;
+import org.apache.lucene.queryparser.flexible.standard.builders.DummyQueryNodeBuilder;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -22,6 +28,7 @@ public class Item {
     private Component name;
     private ItemLore lore;
     private Boolean glint;
+    private boolean hideToolTip;
     private ItemType itemType;
     private int amount = 1;
     private ClientVersion version;
@@ -57,6 +64,11 @@ public class Item {
 
     public Item setEnchantmentGlint(boolean value) {
         this.glint = value;
+        return this;
+    }
+
+    public Item setHideTooltip(boolean value) {
+        this.hideToolTip = value;
         return this;
     }
 
@@ -100,7 +112,6 @@ public class Item {
         return (row - 1) * 9 + (column - 1);
     }
 
-
     public ItemStack build() {
         ItemStack item = builder.build();
         item.setAmount(amount);
@@ -108,6 +119,7 @@ public class Item {
         if (lore != null) item.setComponent(ComponentTypes.LORE, lore);
         if (glint != null) item.setComponent(ComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, glint);
         if (headProfile != null) item.setComponent(ComponentTypes.PROFILE, headProfile);
+        //if(hideToolTip) item.setComponent(ComponentTypes.HIDE_TOOLTIP, Dummy.DUMMY);
 
         if (name == null) return item;
         NBTCompound display = new NBTCompound();

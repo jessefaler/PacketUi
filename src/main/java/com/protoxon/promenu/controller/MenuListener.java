@@ -4,7 +4,9 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientNameItem;
 import com.protoxon.promenu.Item;
+import com.protoxon.promenu.menus.search.SearchMenu;
 import com.protoxon.promenu.types.ClickData;
 import com.protoxon.promenu.utils.ClickDataMapper;
 import com.protoxon.promenu.types.ClickType;
@@ -18,17 +20,19 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class MenuListener {
 
     public static void onClickWindow(PacketReceiveEvent event) {
-
         User user = event.getUser();
         WrapperPlayClientClickWindow packet = new WrapperPlayClientClickWindow(event);
+        Menu menu = MenuService.getMenu(user);
+        if(menu == null || menu.windowId != packet.getWindowId()) {
+            return;
+        }
         ClickData clickData = ClickDataMapper.getClickData(packet, packet.getSlot(), user);
-        Menu menu = MenuService.getMenu(clickData.user);
+
+        user.sendMessage(Component.text("Click Type: " + clickData.clickType + ", Button Type: " + clickData.buttonType + ", Slot: " + clickData.slot + " Window Id: " + packet.getWindowId()).color(NamedTextColor.GOLD));
 
         if(clickData.clickType == ClickType.PICKUP_ALL) {
             return;
         }
-
-        user.sendMessage(Component.text("Click Type: " + clickData.clickType + ", Button Type: " + clickData.buttonType + ", Slot: " + clickData.slot).color(NamedTextColor.GOLD));
 
         if(clickData.slot > menu.getInventoryType().getSize() - 1) {
             return;
@@ -43,7 +47,19 @@ public class MenuListener {
     }
 
     public static void onCloseWindow(PacketReceiveEvent event) {
+        Menu menu = MenuService.getMenu(event.getUser());
+        if(menu == null) return;
+        menu.onClose();
         event.getUser().sendMessage("Closed Window");
+    }
+
+    public static void onNameItem(PacketReceiveEvent event) {
+        WrapperPlayClientNameItem namePacket = new WrapperPlayClientNameItem(event);
+        Menu menu = MenuService.getMenu(event.getUser());
+        if(menu == null) return;
+        if (menu instanceof SearchMenu searchMenu) {
+            searchMenu.setInput(namePacket.getItemName());
+        }
     }
 
     private static void undoInteraction(User user, Menu menu, ClickData clickData) {

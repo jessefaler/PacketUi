@@ -38,6 +38,7 @@ public class MenuCommand {
         User user = PacketEvents.getAPI().getPlayerManager().getUser(context.getSource());
         Player player = (Player) context.getSource();
         Menu menu = new SelectionMenu(user);
+        menu.open();
         return 0;
     }
 }

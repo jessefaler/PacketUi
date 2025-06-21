@@ -2,9 +2,13 @@ package com.protoxon.promenu;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
-import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.google.inject.Inject;
 import com.protoxon.promenu.controller.PacketListener;
+import com.protoxon.promenu.map.MapDatabase;
+import com.protoxon.promenu.map.MapRegistry;
+import com.protoxon.promenu.map.MapType;
+import com.protoxon.promenu.map.TestMaps;
+import com.protoxon.promenu.menus.search.MapSearchIndex;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
@@ -15,6 +19,7 @@ import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.proxy.ProxyServer;
 import org.slf4j.Logger;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import static com.protoxon.promenu.utils.Color.*;
@@ -37,6 +42,7 @@ public class ProMenu {
     public static ProxyServer proxy;
     public static ProMenu plugin;
     public static PacketListener packetListener = new PacketListener();
+    public static MapDatabase mapDatabase;
 
     @Inject //inject the proxy server and logger into the plugin class
     public ProMenu(ProxyServer proxy, Logger logger) {
@@ -49,10 +55,26 @@ public class ProMenu {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         System.out.println(startMessage());
         MenuCommand.register();
+        mapDatabase = new MapDatabase();
+        TestMaps.addMaps();
+        initializeMapData();
 
         // Register packet listeners
         PacketEvents.getAPI().getEventManager().registerListener(packetListener, PacketListenerPriority.NORMAL);
         PacketEvents.getAPI().init(); // Initialize PacketEvents API
+    }
+
+    public void initializeMapData() {
+        // Read in maps from the database and add them to the map registry
+        MapRegistry.addMaps(MapType.MINIGAMES, mapDatabase.getMapsByType(MapType.MINIGAMES));
+        MapRegistry.addMaps(MapType.ADVENTURE, mapDatabase.getMapsByType(MapType.ADVENTURE));
+        // Build the search index's
+        try {
+            MapSearchIndex.rebuildIndex(MapRegistry.getMaps(MapType.MINIGAMES), MapType.MINIGAMES);
+            MapSearchIndex.rebuildIndex(MapRegistry.getMaps(MapType.ADVENTURE), MapType.ADVENTURE);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Subscribe

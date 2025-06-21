@@ -15,7 +15,7 @@ public class SoundPackets {
      * @param user  the user to whom the sound will be played
      */
     public void play(Sound sound, User user) {
-        SoundCategory category = SoundCategory.AMBIENT;
+        SoundCategory category = SoundCategory.VOICE;
         Vector3i position = new Vector3i(0, 0, 0);
         WrapperPlayServerSoundEffect packet = new WrapperPlayServerSoundEffect(
                 sound,
@@ -23,6 +23,27 @@ public class SoundPackets {
                 position,
                 99999999999999999999999999999999999999.0f, // volume
                 1.0f  // pitch
+        );
+
+        user.sendPacket(packet);
+    }
+
+    /**
+     * Plays an ambient sound at the origin (0, 0, 0) with maximum volume.
+     *
+     * @param sound the sound to play
+     * @param user  the user to whom the sound will be played
+     * @param pitch the sound pitch
+     */
+    public void play(Sound sound, float pitch, User user) {
+        SoundCategory category = SoundCategory.VOICE;
+        Vector3i position = new Vector3i(0, 0, 0);
+        WrapperPlayServerSoundEffect packet = new WrapperPlayServerSoundEffect(
+                sound,
+                category,
+                position,
+                99999999999999999999999999999999999999.0f, // volume
+                pitch  // pitch
         );
 
         user.sendPacket(packet);

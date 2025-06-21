@@ -3,6 +3,7 @@ package com.protoxon.promenu.menus.pagination;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.protoxon.promenu.Item;
+import com.protoxon.promenu.map.MapType;
 import com.protoxon.promenu.menus.SelectionMenu;
 import com.protoxon.promenu.service.Content;
 import com.protoxon.promenu.service.MenuService;
@@ -14,7 +15,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import java.util.List;
 
 public class AdventureMapsPaginationMenu extends PaginationMenu {
-    private static final Component TITLE = Component.text("Minigames");
+    private static final Component TITLE = Component.text("Adventure Maps");
     private static final InventoryType INVENTORY_TYPE = InventoryType.GENERIC9X6;
 
     public AdventureMapsPaginationMenu(User user) {
@@ -24,6 +25,26 @@ public class AdventureMapsPaginationMenu extends PaginationMenu {
     @Override
     public void onOpen() {
         super.onOpen();
+    }
+
+    @Override
+    public MapType getMapType() {
+        return MapType.ADVENTURE;
+    }
+
+    @Override
+    public void onNext() {
+
+    }
+
+    @Override
+    public void onPrevious() {
+
+    }
+
+    @Override
+    public int maxPage() {
+        return 0;
     }
 
     @Override
@@ -47,5 +68,10 @@ public class AdventureMapsPaginationMenu extends PaginationMenu {
         );
 
         return content;
+    }
+
+    @Override
+    public String getMenuName() {
+        return "Adventure Maps";
     }
 }

@@ -11,7 +11,7 @@ public abstract class Menu {
 
     public final User user;
     private Content content;
-    private Component title;
+    protected Component title;
     protected final InventoryType inventoryType;
     public int windowId;
 
@@ -21,12 +21,17 @@ public abstract class Menu {
         MenuService.addMenu(user, this);
         this.inventoryType = inventoryType;
         this.title = title;
-        open();
     }
 
     public void open() {
         Packet.inventory().open(user, inventoryType, title);
         onOpen();
+    }
+
+    public void reopen() {
+        MenuService.addMenu(user, this);
+        Packet.inventory().open(user, inventoryType, title);
+        resend();
     }
 
     private int getWindowId() {
@@ -41,6 +46,10 @@ public abstract class Menu {
     }
 
     public abstract void onOpen();
+
+    public void onClose() {
+        MenuService.removeMenu(user);
+    }
 
     public void close() {
         Packet.inventory().close(user);
@@ -63,6 +72,11 @@ public abstract class Menu {
     public void update() {
         if(content == null) return;
         content.update(user);
+    }
+
+    public void resend() {
+        if(content == null) return;
+        content.resend(user);
     }
 
     public InventoryType getInventoryType() {

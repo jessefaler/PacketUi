@@ -19,7 +19,7 @@ public class Content {
         items = new Item[inventoryType.getSize()];
     }
 
-    public void add(int slot, Item item) {
+    public synchronized void add(int slot, Item item) {
         modifications.add(slot);
         items[slot] = item;
     }
@@ -34,7 +34,7 @@ public class Content {
      *
      * @param user the target user to receive the inventory update
      */
-    public void update(User user) {
+    public synchronized void update(User user) {
         if(modifications.size() >= 5) {
             user.sendMessage(Component.text("Performed full inventory update.").color(NamedTextColor.GRAY));
             Packet.inventory().putItems(user, getItems());
@@ -48,6 +48,10 @@ public class Content {
         modifications.clear();
     }
 
+    public void resend(User user) {
+        Packet.inventory().putItems(user, getItems());
+    }
+
     public List<Item> getItems() {
         return Arrays.asList(items);
     }
@@ -56,4 +60,33 @@ public class Content {
         return items[slot];
     }
 
+    /**
+     * Fills a row in the inventory with the given item.
+     * @param row the 1-based row index (1 = top row)
+     * @param item the item to place in the row
+     */
+    public synchronized void fillRow(int row, Item item) {
+        int columns = 9; // standard row size
+        int start = (row - 1) * columns;
+        for (int i = 0; i < columns; i++) {
+            int slot = start + i;
+            if (slot >= items.length) break;
+            add(slot, item);
+        }
+    }
+
+    /**
+     * Fills a column in the inventory with the given item.
+     * @param column the 1-based column index (1 = leftmost column)
+     * @param item the item to place in the column
+     */
+    public synchronized void fillColumn(int column, Item item) {
+        int columns = 9; // standard column count
+        int col = column - 1;
+        for (int row = 0; row < items.length / columns; row++) {
+            int slot = row * columns + col;
+            if (slot >= items.length) break;
+            add(slot, item);
+        }
+    }
 }

@@ -12,16 +12,16 @@ public class ClickDataMapper {
 
     public static ClickData getClickData(WrapperPlayClientClickWindow packet, int slot, User user) {
         WrapperPlayClientClickWindow.WindowClickType type = packet.getWindowClickType();
+        ItemStack carriedItem = packet.getCarriedItemStack();
 
         switch (type) {
             case PICKUP: {
-                ItemStack carriedItem = packet.getCarriedItemStack();
                 boolean isCarriedItemExist = !carriedItem.equals(ItemStack.EMPTY) && carriedItem.getType() != ItemTypes.AIR;
 
                 if (packet.getButton() == 0) {
-                    return new ClickData(ButtonType.LEFT, isCarriedItemExist ? ClickType.PICKUP : ClickType.PLACE, slot, user);
+                    return new ClickData(ButtonType.LEFT, isCarriedItemExist ? ClickType.PICKUP : ClickType.PLACE, slot, carriedItem, user);
                 } else {
-                    return new ClickData(ButtonType.RIGHT, isCarriedItemExist ? ClickType.PLACE : ClickType.PICKUP, slot, user);
+                    return new ClickData(ButtonType.RIGHT, isCarriedItemExist ? ClickType.PLACE : ClickType.PICKUP, slot, carriedItem, user);
                 }
             }
 
@@ -30,6 +30,7 @@ public class ClickDataMapper {
                         packet.getButton() == 0 ? ButtonType.SHIFT_LEFT : ButtonType.SHIFT_RIGHT,
                         ClickType.SHIFT_CLICK,
                         slot,
+                        carriedItem,
                         user
                 );
             }
@@ -37,16 +38,16 @@ public class ClickDataMapper {
             case SWAP: {
                 int button = packet.getButton();
                 if (button >= 0 && button <= 8) {
-                    return new ClickData(ButtonType.values()[9 + button], ClickType.PICKUP, slot, user);
+                    return new ClickData(ButtonType.values()[9 + button], ClickType.PICKUP, slot, carriedItem, user);
                 } else if (button == 40) {
-                    return new ClickData(ButtonType.F, ClickType.PICKUP, slot, user);
+                    return new ClickData(ButtonType.F, ClickType.PICKUP, slot, carriedItem, user);
                 } else {
-                    return new ClickData(ButtonType.LEFT, ClickType.PLACE, slot, user);
+                    return new ClickData(ButtonType.LEFT, ClickType.PLACE, slot, carriedItem, user);
                 }
             }
 
             case CLONE: {
-                return new ClickData(ButtonType.MIDDLE, ClickType.PICKUP, slot, user);
+                return new ClickData(ButtonType.MIDDLE, ClickType.PICKUP, slot, carriedItem, user);
             }
 
             case THROW: {
@@ -54,31 +55,32 @@ public class ClickDataMapper {
                         packet.getButton() == 0 ? ButtonType.DROP : ButtonType.CTRL_DROP,
                         ClickType.PICKUP,
                         slot,
+                        carriedItem,
                         user
                 );
             }
 
             case QUICK_CRAFT: {
                 switch (packet.getButton()) {
-                    case 0: return new ClickData(ButtonType.LEFT, ClickType.DRAG_START, slot, user);
-                    case 4: return new ClickData(ButtonType.RIGHT, ClickType.DRAG_START, slot, user);
-                    case 8: return new ClickData(ButtonType.MIDDLE, ClickType.DRAG_START, slot, user);
-                    case 1: return new ClickData(ButtonType.LEFT, ClickType.DRAG_ADD, slot, user);
-                    case 5: return new ClickData(ButtonType.RIGHT, ClickType.DRAG_ADD, slot, user);
-                    case 9: return new ClickData(ButtonType.MIDDLE, ClickType.DRAG_ADD, slot, user);
-                    case 2: return new ClickData(ButtonType.LEFT, ClickType.DRAG_END, slot, user);
-                    case 6: return new ClickData(ButtonType.RIGHT, ClickType.DRAG_END, slot, user);
-                    case 10: return new ClickData(ButtonType.MIDDLE, ClickType.DRAG_END, slot, user);
-                    default: return new ClickData(ButtonType.LEFT, ClickType.UNDEFINED, slot, user);
+                    case 0: return new ClickData(ButtonType.LEFT, ClickType.DRAG_START, slot, carriedItem, user);
+                    case 4: return new ClickData(ButtonType.RIGHT, ClickType.DRAG_START, slot, carriedItem, user);
+                    case 8: return new ClickData(ButtonType.MIDDLE, ClickType.DRAG_START, slot, carriedItem, user);
+                    case 1: return new ClickData(ButtonType.LEFT, ClickType.DRAG_ADD, slot, carriedItem, user);
+                    case 5: return new ClickData(ButtonType.RIGHT, ClickType.DRAG_ADD, slot, carriedItem, user);
+                    case 9: return new ClickData(ButtonType.MIDDLE, ClickType.DRAG_ADD, slot, carriedItem, user);
+                    case 2: return new ClickData(ButtonType.LEFT, ClickType.DRAG_END, slot, carriedItem, user);
+                    case 6: return new ClickData(ButtonType.RIGHT, ClickType.DRAG_END, slot, carriedItem, user);
+                    case 10: return new ClickData(ButtonType.MIDDLE, ClickType.DRAG_END, slot, carriedItem, user);
+                    default: return new ClickData(ButtonType.LEFT, ClickType.UNDEFINED, slot, carriedItem, user);
                 }
             }
 
             case PICKUP_ALL: {
-                return new ClickData(ButtonType.DOUBLE_CLICK, ClickType.PICKUP_ALL, slot, user);
+                return new ClickData(ButtonType.DOUBLE_CLICK, ClickType.PICKUP_ALL, slot, carriedItem, user);
             }
 
             default: {
-                return new ClickData(ButtonType.LEFT, ClickType.UNDEFINED, slot, user);
+                return new ClickData(ButtonType.LEFT, ClickType.UNDEFINED, slot, carriedItem, user);
             }
         }
     }
