@@ -22,6 +22,13 @@ public class MapRegistry {
         return null;
     }
 
+    public static List<Map> getAllMaps() {
+        List<Map> allMaps = new ArrayList<>();
+        allMaps.addAll(minigameMaps);
+        allMaps.addAll(adventureMaps);
+        return allMaps;
+    }
+
     public static void addMap(MapType mapType, Map map) {
         getMaps(mapType).add(map);
     }
@@ -98,5 +105,19 @@ public class MapRegistry {
         }
 
         return sortedList;
+    }
+
+    public static Map getMap(String name) {
+        for (Map map : minigameMaps) {
+            if (map.getName().equalsIgnoreCase(name)) {
+                return map;
+            }
+        }
+        for (Map map : adventureMaps) {
+            if (map.getName().equalsIgnoreCase(name)) {
+                return map;
+            }
+        }
+        return null;
     }
 }

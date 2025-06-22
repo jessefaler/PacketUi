@@ -4,6 +4,7 @@ import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import com.protoxon.promenu.Item;
+import com.protoxon.promenu.database.Database;
 import com.protoxon.promenu.map.Map;
 import com.protoxon.promenu.packets.Packet;
 import com.protoxon.promenu.service.Content;
@@ -14,6 +15,8 @@ import com.protoxon.promenu.user.UserRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+
+import java.util.List;
 
 public class MapOptionsMenu extends Menu {
 
@@ -41,6 +44,7 @@ public class MapOptionsMenu extends Menu {
         } else {
             returnMenu.reopen();
         }
+        UserRegistry.getUserData(user).saveFavoritesToDatabase();
     }
 
     public Content pageContent() {
@@ -66,8 +70,12 @@ public class MapOptionsMenu extends Menu {
                 Item.builder()
                         .setType(ItemTypes.NETHER_STAR)
                         .setName(Component.text("Active Games").color(NamedTextColor.GOLD))
+                        .setLore(List.of(
+                                Component.text("Not Implemented").color(NamedTextColor.GRAY),
+                                Component.text("! Coming soon !").color(NamedTextColor.RED)
+                        ))
                         .setClickAction(clickData -> {
-                            clickData.user.sendMessage(Component.text("Opening active games menu").color(NamedTextColor.GREEN));
+                            Packet.sound().play(Sounds.BLOCK_NOTE_BLOCK_GUITAR, 0, user);
                         })
         );
 
@@ -114,6 +122,7 @@ public class MapOptionsMenu extends Menu {
                             } else {
                                  returnMenu.reopen();
                             }
+                            UserRegistry.getUserData(user).saveFavoritesToDatabase();
                         })
         );
 

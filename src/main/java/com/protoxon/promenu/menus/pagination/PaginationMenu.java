@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import com.protoxon.promenu.Item;
 import com.protoxon.promenu.map.MapType;
+import com.protoxon.promenu.menus.HistoryMenu;
 import com.protoxon.promenu.menus.SortType;
 import com.protoxon.promenu.menus.FavoritesMenu;
 import com.protoxon.promenu.menus.search.SearchMenu;
@@ -148,7 +149,8 @@ public abstract class PaginationMenu extends Menu {
                         .setType(ItemTypes.CLOCK)
                         .setName(Component.text("History").color(NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.UNDERLINED, true))
                         .setClickAction(clickData -> {
-                            clickData.user.sendMessage(Component.text("History").color(NamedTextColor.GOLD));
+                            Packet.sound().play(Sounds.UI_TOAST_IN, clickData.user);
+                            new HistoryMenu(user, Component.text(getMenuName() + " History").color(TextColor.color(0x1063a1)).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.UNDERLINED, true), this, UserRegistry.getUserData(user).getMapHistory(getMapType()), getMapType()).open();
                         })
         );
 

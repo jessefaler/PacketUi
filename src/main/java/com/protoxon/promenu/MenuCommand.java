@@ -35,10 +35,13 @@ public class MenuCommand {
     }
 
     private static int handleRootCommand(CommandContext<CommandSource> context) {
+        if(!(context.getSource() instanceof Player)) {
+            System.err.println("[ProMenu] Only players can run this command!");
+            return 0;
+        }
         User user = PacketEvents.getAPI().getPlayerManager().getUser(context.getSource());
-        Player player = (Player) context.getSource();
         Menu menu = new SelectionMenu(user);
         menu.open();
-        return 0;
+        return 1;
     }
 }
